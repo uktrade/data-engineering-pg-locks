@@ -30,7 +30,7 @@ If you are still stuck, you can run:
 python hint_for_task_1
 ```
 
-## Second task - Resolving Block
+## Task 2 - Resolving Block
 For task 2, execute the following:
 ```
 python task_2
