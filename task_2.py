@@ -9,17 +9,12 @@ from generic_setup import get_cursor, get_locks
 sql_1 = '''
 BEGIN;
 UPDATE my_table
-SET v='x' WHERE id=1;
+SET v='a' WHERE id=1;
 '''
 
 sql_2 = '''
 BEGIN;
-UPDATE my_table SET v='x' WHERE id=2;  
-UPDATE my_table SET v='x' WHERE id=1;
-'''
-
-sql_1_b = '''
-UPDATE my_table SET v='x' WHERE id=2;  
+UPDATE my_table SET v='b' WHERE id=1;  
 '''
 
 
@@ -33,23 +28,16 @@ with \
     cur_2.execute('SET statement_timeout = 5000;')
 
 
-# Somewhere here a solution needs to be implemented...
     print('Running...\n')
     try:
         print('Connection 1:', sql_1)
         cur_1.execute(sql_1)
 
-        if sql_1_b:
-            print('Connection 1:', sql_1_b)
-            def after_delay():
-                time.sleep(0.25)
-                cur_1.execute(sql_1_b)
-            executor.submit(after_delay)
 
         print('Connection 2:', sql_2)
         cur_2.execute(sql_2)
 
-    except psycopg2.errors.DeadlockDetected:
-        print("\033[91m\033[1mDEADLOCK")
+    except psycopg2.errors.QueryCanceled:
+        print("\033[91m\033[1mBLOCK")
     else:
         print("\033[92m\033[1mNO BLOCK - Move onto the next task :)")
